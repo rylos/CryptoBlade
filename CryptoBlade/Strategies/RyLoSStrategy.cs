@@ -119,12 +119,16 @@ namespace CryptoBlade.Strategies
                                && hasAllRequiredMa
                                && mfiTrend == Trend.Long
                                && (eriTrend == Trend.Long || movingAverageTrend == Trend.Long)
+                               && ticker != null
+                               && ticker.BestBidPrice < (decimal)lastkc!.LowerBand!.Value
                                && hasMinSpread;
 
                 hasSellSignal = hasMinVolume
                                 && hasAllRequiredMa
                                 && mfiTrend == Trend.Short
                                 && (eriTrend == Trend.Short || movingAverageTrend == Trend.Short)
+                                && ticker != null
+                                && ticker.BestAskPrice > (decimal)lastkc!.UpperBand!.Value
                                 && hasMinSpread;
 
                 hasBuyExtraSignal = hasMinVolume
