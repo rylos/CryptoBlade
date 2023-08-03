@@ -44,6 +44,24 @@ namespace CryptoBlade.Helpers
             return Trend.Neutral;
         }
 
+        public static bool IsKcBuy(KeltnerResult? kc, Quote quote)
+        {
+            if (kc == null)
+                return false;
+            if (!kc.LowerBand.HasValue)
+                return false;
+            bool buy =  quote.Close < ((decimal)kc.LowerBand.Value);
+            return buy;
+        }
+        public static bool IsKcSell(KeltnerResult? kc, Quote quote)
+        {
+            if (kc == null)
+                return false;
+            if (!kc.UpperBand.HasValue)
+                return false;
+            bool sell =  quote.Close > ((decimal)kc.UpperBand.Value);
+            return sell;
+        }
         public static bool IsMfiRsiBuy(MfiResult? mfi, RsiResult? rsi, Quote quote)
         {
             if (mfi == null || rsi == null)

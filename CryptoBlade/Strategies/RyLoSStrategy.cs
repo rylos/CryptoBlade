@@ -17,10 +17,10 @@ namespace CryptoBlade.Strategies
 
     public class RyLoSStrategy : TradingStrategyBase
     {
-        private readonly IOptions<MfiRsiEriTrendTradingStrategyOptions> m_options;
+        private readonly IOptions<RyLoSStrategyOptions> m_options;
         private const int c_candlePeriod = 200;
 
-        public RyLoSStrategy(IOptions<MfiRsiEriTrendTradingStrategyOptions> options, 
+        public RyLoSStrategy(IOptions<RyLoSStrategyOptions> options, 
             string symbol, IWalletManager walletManager, IBybitRestClient restClient) 
             : base(options, symbol, GetRequiredTimeFrames(), walletManager, restClient)
         {
