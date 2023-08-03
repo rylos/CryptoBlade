@@ -88,6 +88,10 @@ namespace CryptoBlade.Strategies
                     indicators.Add(new StrategyIndicator(nameof(IndicatorType.Mfi1Min), lastMfi.Mfi.Value));
                 if (lastRsi?.Rsi != null)
                     indicators.Add(new StrategyIndicator(nameof(IndicatorType.Rsi1Min), lastRsi.Rsi.Value));
+                if (lastkc?.LowerBand != null)
+                    indicators.Add(new StrategyIndicator(nameof(IndicatorType.KCLower), lastkc.LowerBand.Value));
+                if (lastkc?.UpperBand != null)
+                    indicators.Add(new StrategyIndicator(nameof(IndicatorType.KCUpper), lastkc.UpperBand.Value));
             }
 
             return Task.FromResult(new SignalEvaluation(hasBuySignal, hasSellSignal, hasBuySignal, hasSellSignal, indicators.ToArray()));
