@@ -66,7 +66,7 @@ namespace CryptoBlade.Strategies
             {
                 var spread5Min = TradeSignalHelpers.Get5MinSpread(quotes);
                 var mfi = quotes.GetMfi();
-                var kc = quotes.GetKeltner();
+                var kc = quotes.GetKeltner(emaPeriods:20, multiplier: 2, atrPeriods: 10);
                 var lastkc = kc.LastOrDefault();
                 var lastMfi = mfi.LastOrDefault();
                 var rsi = quotes.GetRsi();

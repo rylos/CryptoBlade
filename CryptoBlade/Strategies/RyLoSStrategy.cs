@@ -73,7 +73,7 @@ namespace CryptoBlade.Strategies
             if (lastQuote != null)
             {
                 var sma = quotes.GetSma(14);
-                var kc = quotes.GetKeltner();
+                var kc = quotes.GetKeltner(emaPeriods:20, multiplier: 2, atrPeriods: 10);
                 var lastkc = kc.LastOrDefault();
                 var lastSma = sma.LastOrDefault();
                 var spread5Min = TradeSignalHelpers.Get5MinSpread(quotes);
