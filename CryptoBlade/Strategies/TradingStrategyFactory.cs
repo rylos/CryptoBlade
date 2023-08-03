@@ -29,6 +29,9 @@ namespace CryptoBlade.Strategies
             if (string.Equals("MfiRsiEriTrend", strategyName, StringComparison.OrdinalIgnoreCase))
                 return CreateMfiRsiEriTrendPreciseStrategy(config, symbol);
 
+            if (string.Equals("RyLoS", strategyName, StringComparison.OrdinalIgnoreCase))
+                return CreateRyLoSStrategy(config, symbol);
+
             return CreateAutoHedgeStrategy(config, symbol);
         }
 
@@ -78,6 +81,22 @@ namespace CryptoBlade.Strategies
                 TradingMode = GetTradingMode(config, symbol)
             });
             return new MfiRsiEriTrendTradingStrategy(options, symbol, m_walletManager, m_bybitRestClient);
+        }
+
+        private ITradingStrategy CreateRyLoSStrategy(TradingBotOptions config, string symbol)
+        {
+            var options = Options.Create(new RyLoSStrategyOptions
+            {
+                MinimumPriceDistance = config.MinimumPriceDistance,
+                MinimumVolume = config.MinimumVolume,
+                DcaOrdersCount = config.DcaOrdersCount,
+                WalletExposureLong = config.WalletExposureLong,
+                WalletExposureShort = config.WalletExposureShort,
+                ForceMinQty = config.ForceMinQty,
+                PlaceOrderAttempts = config.PlaceOrderAttempts,
+                TradingMode = GetTradingMode(config, symbol)
+            });
+            return new RyLoSStrategy(options, symbol, m_walletManager, m_bybitRestClient);
         }
 
         private TradingMode GetTradingMode(TradingBotOptions config, string symbol)
