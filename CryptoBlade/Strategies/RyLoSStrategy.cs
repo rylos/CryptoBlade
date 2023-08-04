@@ -73,8 +73,10 @@ namespace CryptoBlade.Strategies
             if (lastQuote != null)
             {
                 var sma = quotes.GetSma(14);
-                var kc = quotes.GetKeltner(emaPeriods:20, multiplier: 2, atrPeriods: 10);
-                var lastkc = kc.LastOrDefault();
+                //var kc = quotes.GetKeltner(emaPeriods:20, multiplier: 2, atrPeriods: 10);
+                //var lastkc = kc.LastOrDefault();
+                var bb = quotes.GetBollingerBands();
+                var lastbb = bb.LastOrDefault();
                 var lastSma = sma.LastOrDefault();
                 var spread5Min = TradeSignalHelpers.Get5MinSpread(quotes);
                 var mfiTrend = TradeSignalHelpers.GetMfiTrend(quotes);
@@ -92,9 +94,9 @@ namespace CryptoBlade.Strategies
                                         && ma6HighLast.Sma.HasValue
                                         && ma6LowLast != null
                                         && ma6LowLast.Sma.HasValue
-                                        && lastkc != null
-                                        && lastkc.LowerBand.HasValue
-                                        && lastkc.UpperBand.HasValue;
+                                        && lastbb != null
+                                        && lastbb.LowerBand.HasValue
+                                        && lastbb.UpperBand.HasValue;
 
                 var ticker = Ticker;
 
@@ -120,7 +122,7 @@ namespace CryptoBlade.Strategies
                                && mfiTrend == Trend.Long
                                && (eriTrend == Trend.Long || movingAverageTrend == Trend.Long)
                                && ticker != null
-                               && ticker.BestBidPrice < (decimal)lastkc!.LowerBand!.Value
+                               && ticker.BestBidPrice < (decimal)lastbb!.LowerBand!.Value
                                && hasMinSpread;
 
                 hasSellSignal = hasMinVolume
@@ -128,7 +130,7 @@ namespace CryptoBlade.Strategies
                                 && mfiTrend == Trend.Short
                                 && (eriTrend == Trend.Short || movingAverageTrend == Trend.Short)
                                 && ticker != null
-                                && ticker.BestAskPrice > (decimal)lastkc!.UpperBand!.Value
+                                && ticker.BestAskPrice > (decimal)lastbb!.UpperBand!.Value
                                 && hasMinSpread;
 
                 hasBuyExtraSignal = hasMinVolume
@@ -139,7 +141,7 @@ namespace CryptoBlade.Strategies
                                     && hasMinSpread
                                     && longPosition != null
                                     && ticker != null
-                                    && ticker.BestBidPrice < (decimal)lastkc!.LowerBand!.Value
+                                    && ticker.BestBidPrice < (decimal)lastbb!.LowerBand!.Value
                                     && ticker.BestBidPrice < longPosition.AveragePrice/1.002m; //0.2% RyLoS
 
                 hasSellExtraSignal = hasMinVolume
@@ -150,7 +152,7 @@ namespace CryptoBlade.Strategies
                                      && hasMinSpread
                                      && shortPosition != null
                                      && ticker != null
-                                     && ticker.BestAskPrice > (decimal)lastkc!.UpperBand!.Value
+                                     && ticker.BestAskPrice > (decimal)lastbb!.UpperBand!.Value
                                      && ticker.BestAskPrice > shortPosition.AveragePrice*1.002m; //0.2% RyLoS
 
                 indicators.Add(new StrategyIndicator(nameof(IndicatorType.Volume1Min), volume));
