@@ -37,44 +37,42 @@ namespace CryptoBlade.Strategies
 
         private ITradingStrategy CreateAutoHedgeStrategy(TradingBotOptions config, string symbol)
         {
-            var options = Options.Create(new AutoHedgeStrategyOptions
-            {
-                MinimumPriceDistance = config.MinimumPriceDistance,
-                MinimumVolume = config.MinimumVolume,
-                DcaOrdersCount = config.DcaOrdersCount,
-                WalletExposureLong = config.WalletExposureLong,
-                WalletExposureShort = config.WalletExposureShort,
-                ForceMinQty = config.ForceMinQty,
-                PlaceOrderAttempts = config.PlaceOrderAttempts,
-                TradingMode = GetTradingMode(config, symbol),
-                MaxAbsFundingRate = config.MaxAbsFundingRate,
-            });
+            var options = CreateTradeOptions<AutoHedgeStrategyOptions>(config, symbol,
+                strategyOptions =>
+                {
+                    strategyOptions.MinimumPriceDistance = config.MinimumPriceDistance;
+                    strategyOptions.MinimumVolume = config.MinimumVolume;
+                });
             return new AutoHedgeStrategy(options, symbol, m_walletManager, m_bybitRestClient);
         }
 
         private ITradingStrategy CreateMfiRsiCandlePreciseStrategy(TradingBotOptions config, string symbol)
         {
-            var options = Options.Create(new MfiRsiCandlePreciseTradingStrategyOptions
-            {
-                MinimumPriceDistance = config.MinimumPriceDistance,
-                MinimumVolume = config.MinimumVolume,
-                DcaOrdersCount = config.DcaOrdersCount,
-                WalletExposureLong = config.WalletExposureLong,
-                WalletExposureShort = config.WalletExposureShort,
-                ForceMinQty = config.ForceMinQty,
-                PlaceOrderAttempts = config.PlaceOrderAttempts,
-                TradingMode = GetTradingMode(config, symbol),
-                MaxAbsFundingRate = config.MaxAbsFundingRate,
-            });
+            var options = CreateTradeOptions<MfiRsiCandlePreciseTradingStrategyOptions>(config, symbol,
+                strategyOptions =>
+                {
+                    strategyOptions.MinimumPriceDistance = config.MinimumPriceDistance;
+                    strategyOptions.MinimumVolume = config.MinimumVolume;
+                });
             return new MfiRsiCandlePreciseTradingStrategy(options, symbol, m_walletManager, m_bybitRestClient);
         }
 
         private ITradingStrategy CreateMfiRsiEriTrendPreciseStrategy(TradingBotOptions config, string symbol)
         {
-            var options = Options.Create(new MfiRsiEriTrendTradingStrategyOptions
+            var options = CreateTradeOptions<MfiRsiEriTrendTradingStrategyOptions>(config, symbol,
+                strategyOptions =>
+                {
+                    strategyOptions.MinimumPriceDistance = config.MinimumPriceDistance;
+                    strategyOptions.MinimumVolume = config.MinimumVolume;
+                });
+            return new MfiRsiEriTrendTradingStrategy(options, symbol, m_walletManager, m_bybitRestClient);
+        }
+
+        private IOptions<TOptions> CreateTradeOptions<TOptions>(TradingBotOptions config, string symbol, Action<TOptions> optionsSetup) 
+            where TOptions : TradingStrategyBaseOptions, new()
+        {
+            var options = new TOptions
             {
-                MinimumPriceDistance = config.MinimumPriceDistance,
-                MinimumVolume = config.MinimumVolume,
                 DcaOrdersCount = config.DcaOrdersCount,
                 WalletExposureLong = config.WalletExposureLong,
                 WalletExposureShort = config.WalletExposureShort,
@@ -82,8 +80,11 @@ namespace CryptoBlade.Strategies
                 PlaceOrderAttempts = config.PlaceOrderAttempts,
                 TradingMode = GetTradingMode(config, symbol),
                 MaxAbsFundingRate = config.MaxAbsFundingRate,
-            });
-            return new MfiRsiEriTrendTradingStrategy(options, symbol, m_walletManager, m_bybitRestClient);
+                FeeRate = config.FeeRate,
+                MinProfitRate = config.MinProfitRate,
+            };
+            optionsSetup(options);
+            return Options.Create(options);
         }
 
         private ITradingStrategy CreateRyLoSStrategy(TradingBotOptions config, string symbol)
