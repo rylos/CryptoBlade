@@ -161,6 +161,8 @@ namespace CryptoBlade.Strategies
                 indicators.Add(new StrategyIndicator(nameof(IndicatorType.EriTrend), eriTrend));
                 indicators.Add(new StrategyIndicator(nameof(IndicatorType.MfiTrend), mfiTrend));
                 indicators.Add(new StrategyIndicator(nameof(IndicatorType.Trend), movingAverageTrend));
+                indicators.Add(new StrategyIndicator(nameof(IndicatorType.BBUpper), lastbb!.UpperBand!.Value));
+                indicators.Add(new StrategyIndicator(nameof(IndicatorType.BBLower), lastbb!.LowerBand!.Value));
 
                 if (hasAllRequiredMa)
                 {

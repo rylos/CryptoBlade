@@ -22,7 +22,7 @@
         MainTimeFrameVolume,
         MfiTrend,
         EriTrend,
-        KCLower,
-        KCUpper
+        BBLower,
+        BBUpper
     }
 }
