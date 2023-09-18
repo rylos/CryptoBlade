@@ -33,6 +33,9 @@ namespace CryptoBlade.Strategies
             if (string.Equals(StrategyNames.LinearRegression, strategyName, StringComparison.OrdinalIgnoreCase))
                 return CreateLinearRegressionStrategy(config, symbol);
 
+            if (string.Equals(StrategyNames.LinearRegressionRyLoS, strategyName, StringComparison.OrdinalIgnoreCase))
+                return CreateLinearRegressionStrategyRyLoS(config, symbol);
+
             if (string.Equals(StrategyNames.Tartaglia, strategyName, StringComparison.OrdinalIgnoreCase))
                 return CreateTartagliaStrategy(config, symbol);
 
@@ -88,6 +91,21 @@ namespace CryptoBlade.Strategies
                     strategyOptions.StandardDeviation = config.Strategies.LinearRegression.StandardDeviation;
                 });
             return new LinearRegressionStrategy(options, symbol, m_walletManager, m_restClient);
+        }
+
+        private ITradingStrategy CreateLinearRegressionStrategyRyLoS(TradingBotOptions config, string symbol)
+        {
+            var options = CreateTradeOptions<LinearRegressionStrategyRyLoSOptions>(config, symbol,
+                strategyOptions =>
+                {
+                    strategyOptions.MinimumPriceDistance = config.MinimumPriceDistance;
+                    strategyOptions.MinimumVolume = config.MinimumVolume;
+                    strategyOptions.ChannelLength = config.Strategies.LinearRegressionRyLoS.ChannelLength;
+                    strategyOptions.StandardDeviation = config.Strategies.LinearRegressionRyLoS.StandardDeviation;
+                    strategyOptions.KCLength = config.Strategies.LinearRegressionRyLoS.KCLength;
+                    strategyOptions.KCMultiplier = config.Strategies.LinearRegressionRyLoS.KCMultiplier;
+                });
+            return new LinearRegressionStrategyRyLoS(options, symbol, m_walletManager, m_restClient);
         }
 
         private ITradingStrategy CreateTartagliaStrategy(TradingBotOptions config, string symbol)
