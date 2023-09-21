@@ -322,7 +322,7 @@ namespace CryptoBlade.Strategies.Common
                     && !buyOrders.Any()
                     && dynamicQtyLong.HasValue
                     && NoTradeForCandle(lastPrimaryQuote, LastCandleLongOrder)
-                    && LongFundingWithinLimit(ticker)
+                    // && LongFundingWithinLimit(ticker)
                     && !executeParams.LongUnstucking
                     && executeParams.AllowExtraLong)
                 {
@@ -341,7 +341,7 @@ namespace CryptoBlade.Strategies.Common
                     && !sellOrders.Any()
                     && dynamicQtyShort.HasValue
                     && NoTradeForCandle(lastPrimaryQuote, LastCandleShortOrder)
-                    && ShortFundingWithinLimit(ticker)
+                    // && ShortFundingWithinLimit(ticker)
                     && !executeParams.ShortUnstucking
                     && executeParams.AllowExtraShort)
                 {

@@ -113,7 +113,6 @@ namespace CryptoBlade.Strategies
                         closeHa[i] = (open[i] + high[i] + low[i] + closeHa[i - 1]) / 4;
                     }
                     close_ha = closeHa[closeHa.Length - 1];
-                    // var close_ha = closeHa.TakeLast(5).ToArray();
                     //END HARSI *********************************************************
                 }
 
