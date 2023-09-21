@@ -60,8 +60,8 @@ namespace CryptoBlade.Strategies
                 bool aboveLinRegChannel1min = false;
                 bool belowLinRegChannel5min = false;
                 bool aboveLinRegChannel5min = false;
-                // bool belowKChannel1min = false;
-                // bool aboveKChannel1min = false;
+                bool belowKChannel1min = false;
+                bool aboveKChannel1min = false;
                 bool belowKChannel5min = false;
                 bool aboveKChannel5min = false;
                 bool hasBasicConditions = canBeTraded && hasMinSpread && hasMinVolume;
@@ -78,12 +78,12 @@ namespace CryptoBlade.Strategies
                         aboveLinRegChannel1min = (double)ticker.LastPrice > stdDevChn1min.UpperChannel;
                         aboveLinRegChannel5min = (double)ticker.LastPrice > stdDevChn5min.UpperChannel;
                     }
-                    // var kc1min = quotes1min.GetKeltner(m_options.Value.KCLength, m_options.Value.KCMultiplier).LastOrDefault();
+                    var kc1min = quotes1min.GetKeltner(m_options.Value.KCLength, m_options.Value.KCMultiplier).LastOrDefault();
                     var kc5min = quotes5min.GetKeltner(m_options.Value.KCLength, m_options.Value.KCMultiplier).LastOrDefault();
-                    if (kc5min!=null)
+                    if (kc1min!=null && kc5min!=null)
                     {
-                        // belowKChannel1min = (double)ticker.LastPrice < kc1min.LowerBand;
-                        // aboveKChannel1min = (double)ticker.LastPrice > kc1min.UpperBand;
+                        belowKChannel1min = (double)ticker.LastPrice < kc1min.LowerBand;
+                        aboveKChannel1min = (double)ticker.LastPrice > kc1min.UpperBand;
                         belowKChannel5min = (double)ticker.LastPrice < kc5min.LowerBand;
                         aboveKChannel5min = (double)ticker.LastPrice > kc5min.UpperBand;
                     }
@@ -130,8 +130,8 @@ namespace CryptoBlade.Strategies
                 hasBuyExtraSignal = hasMinVolume
                                && longPosition != null
                                && ticker.BestBidPrice < longPosition.AveragePrice
-                               && (belowLinRegChannel1min || 
-                                  (ticker.BestBidPrice < longPosition.AveragePrice/1.07m))
+                               && (belowLinRegChannel1min || belowKChannel1min)
+                               //   (ticker.BestBidPrice < longPosition.AveragePrice/1.07m))
                                && hasMinSpread
                                && canBeTraded
                                && (close_ha < -20);
@@ -147,8 +147,8 @@ namespace CryptoBlade.Strategies
                 hasSellExtraSignal = hasMinVolume
                                 && shortPosition != null
                                 && ticker.BestAskPrice > shortPosition.AveragePrice
-                                && (aboveLinRegChannel1min ||
-                                   (ticker.BestAskPrice > shortPosition.AveragePrice*1.07m))
+                                && (aboveLinRegChannel1min || aboveKChannel1min)
+                                //   (ticker.BestAskPrice > shortPosition.AveragePrice*1.07m))
                                 && hasMinSpread
                                 && canBeTraded
                                 && (close_ha > 20);
