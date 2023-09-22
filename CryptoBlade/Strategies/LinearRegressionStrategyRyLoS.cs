@@ -130,11 +130,13 @@ namespace CryptoBlade.Strategies
                 hasBuyExtraSignal = hasMinVolume
                                && longPosition != null
                                && ticker.BestBidPrice < longPosition.AveragePrice
-                               && (belowLinRegChannel1min || belowKChannel1min)
-                               //   (ticker.BestBidPrice < longPosition.AveragePrice/1.07m))
+                               && belowKChannel1min
                                && hasMinSpread
                                && canBeTraded
                                && (close_ha < -20);
+                               // && (belowLinRegChannel1min || belowKChannel1min)
+                               //   (ticker.BestBidPrice < longPosition.AveragePrice/1.07m))
+                               
 
                 hasSellSignal = hasMinVolume
                                 && aboveLinRegChannel1min
@@ -147,11 +149,13 @@ namespace CryptoBlade.Strategies
                 hasSellExtraSignal = hasMinVolume
                                 && shortPosition != null
                                 && ticker.BestAskPrice > shortPosition.AveragePrice
-                                && (aboveLinRegChannel1min || aboveKChannel1min)
-                                //   (ticker.BestAskPrice > shortPosition.AveragePrice*1.07m))
+                                && aboveKChannel1min
                                 && hasMinSpread
                                 && canBeTraded
                                 && (close_ha > 20);
+                                // && (aboveLinRegChannel1min || aboveKChannel1min)
+                                //   (ticker.BestAskPrice > shortPosition.AveragePrice*1.07m))
+                                
 
                 indicators.Add(new StrategyIndicator(nameof(IndicatorType.Volume1Min), volume));
                 indicators.Add(new StrategyIndicator(nameof(IndicatorType.MainTimeFrameVolume), volume));

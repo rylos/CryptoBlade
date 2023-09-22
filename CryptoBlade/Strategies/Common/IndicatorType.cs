@@ -24,6 +24,8 @@
         EriTrend,
         LinearRegressionPriceShort,
         LinearRegressionPriceLong,
-        NormalizedAverageTrueRange
+        NormalizedAverageTrueRange,
+        KC1min_upper,
+        KC1min_lower
     }
 }
