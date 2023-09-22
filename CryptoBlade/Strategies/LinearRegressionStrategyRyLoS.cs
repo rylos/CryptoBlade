@@ -66,7 +66,7 @@ namespace CryptoBlade.Strategies
                 bool aboveKChannel5min = false;
                 bool hasBasicConditions = canBeTraded && hasMinSpread && hasMinVolume;
                 // hasBasicConditions = true; // DEBUG
-                double close_ha = 0;
+                // double close_ha = 0;
                 if (hasBasicConditions)
                 {
                     var stdDevChn1min = quotes1min.Use(CandlePart.OC2).GetStdDevChannels(m_options.Value.ChannelLength, m_options.Value.StandardDeviation).LastOrDefault();
@@ -89,30 +89,30 @@ namespace CryptoBlade.Strategies
                     }
                     
                     //HARSI ************************************************************
-                    var ha = quotes1min.GetHeikinAshi();
-                    double[] zRsi = quotes1min.GetRsi(14).Select(result => result.Rsi.HasValue ? result.Rsi.Value - 50 : 0).ToArray();
-                    double[] open = new double[zRsi.Length];
-                    double[] high = new double[zRsi.Length];
-                    double[] low = new double[zRsi.Length];
-                    double[] closeHa = new double[zRsi.Length];
-                    open[0] = zRsi[0];
-                    for (int i = 1; i < zRsi.Length; i++)
-                    {
-                        open[i] = (open[i - 1] + zRsi[i]) / 2;
-                    }
-                    high[0] = zRsi[0];
-                    low[0] = zRsi[0];
-                    for (int i = 1; i < zRsi.Length; i++)
-                    {
-                        high[i] = Math.Max(zRsi[i], Math.Max(open[i], closeHa[i - 1]));
-                        low[i] = Math.Min(zRsi[i], Math.Min(open[i], closeHa[i - 1]));
-                    }
-                    closeHa[0] = (open[0] + high[0] + low[0] + zRsi[0]) / 4;
-                    for (int i = 1; i < zRsi.Length; i++)
-                    {
-                        closeHa[i] = (open[i] + high[i] + low[i] + closeHa[i - 1]) / 4;
-                    }
-                    close_ha = closeHa[closeHa.Length - 1];
+                    // var ha = quotes1min.GetHeikinAshi();
+                    // double[] zRsi = quotes1min.GetRsi(14).Select(result => result.Rsi.HasValue ? result.Rsi.Value - 50 : 0).ToArray();
+                    // double[] open = new double[zRsi.Length];
+                    // double[] high = new double[zRsi.Length];
+                    // double[] low = new double[zRsi.Length];
+                    // double[] closeHa = new double[zRsi.Length];
+                    // open[0] = zRsi[0];
+                    // for (int i = 1; i < zRsi.Length; i++)
+                    // {
+                    //     open[i] = (open[i - 1] + zRsi[i]) / 2;
+                    // }
+                    // high[0] = zRsi[0];
+                    // low[0] = zRsi[0];
+                    // for (int i = 1; i < zRsi.Length; i++)
+                    // {
+                    //     high[i] = Math.Max(zRsi[i], Math.Max(open[i], closeHa[i - 1]));
+                    //     low[i] = Math.Min(zRsi[i], Math.Min(open[i], closeHa[i - 1]));
+                    // }
+                    // closeHa[0] = (open[0] + high[0] + low[0] + zRsi[0]) / 4;
+                    // for (int i = 1; i < zRsi.Length; i++)
+                    // {
+                    //     closeHa[i] = (open[i] + high[i] + low[i] + closeHa[i - 1]) / 4;
+                    // }
+                    // close_ha = closeHa[closeHa.Length - 1];
                     //END HARSI *********************************************************
                 }
 
@@ -124,8 +124,8 @@ namespace CryptoBlade.Strategies
                                && belowLinRegChannel5min
                                && belowKChannel5min
                                && hasMinSpread
-                               && canBeTraded
-                               && (close_ha < -20);
+                               && canBeTraded;
+                               // && (close_ha < -20);
 
                 hasBuyExtraSignal = hasMinVolume
                                && longPosition != null
@@ -133,9 +133,9 @@ namespace CryptoBlade.Strategies
                                && belowKChannel1min
                                && hasMinSpread
                                && canBeTraded
-                               && (close_ha < -20);
-                               // && (belowLinRegChannel1min || belowKChannel1min)
-                               //   (ticker.BestBidPrice < longPosition.AveragePrice/1.07m))
+                               && (belowLinRegChannel1min || (belowKChannel1min && (ticker.BestBidPrice < longPosition.AveragePrice/1.07m)));
+                               // && (close_ha < -20);
+                               
                                
 
                 hasSellSignal = hasMinVolume
@@ -143,8 +143,8 @@ namespace CryptoBlade.Strategies
                                 && aboveLinRegChannel5min
                                 && aboveKChannel5min
                                 && hasMinSpread
-                                && canBeTraded
-                                && (close_ha > 20);
+                                && canBeTraded;
+                                // && (close_ha > 20);
 
                 hasSellExtraSignal = hasMinVolume
                                 && shortPosition != null
@@ -152,9 +152,9 @@ namespace CryptoBlade.Strategies
                                 && aboveKChannel1min
                                 && hasMinSpread
                                 && canBeTraded
-                                && (close_ha > 20);
-                                // && (aboveLinRegChannel1min || aboveKChannel1min)
-                                //   (ticker.BestAskPrice > shortPosition.AveragePrice*1.07m))
+                                && (aboveLinRegChannel1min || (aboveKChannel1min && (ticker.BestAskPrice > shortPosition.AveragePrice*1.07m)));
+                                //&& (close_ha > 20);
+                                
                                 
 
                 indicators.Add(new StrategyIndicator(nameof(IndicatorType.Volume1Min), volume));
