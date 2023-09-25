@@ -290,7 +290,7 @@ namespace CryptoBlade.Strategies.Common
                     && NoTradeForCandle(lastPrimaryQuote, LastCandleLongOrder)
                     && dynamicQtyLong.HasValue
                     && canOpenLongPosition
-                    && LongFundingWithinLimit(ticker))
+                    && LongFundingWithinLimit(ticker, 0.0002m))
                 {
                     m_logger.LogDebug($"{Name}: {Symbol} trying to open long position");
                     if (UseMarketOrdersForEntries)
@@ -305,7 +305,7 @@ namespace CryptoBlade.Strategies.Common
                     && NoTradeForCandle(lastPrimaryQuote, LastCandleShortOrder)
                     && dynamicQtyShort.HasValue
                     && canOpenShortPosition
-                    && ShortFundingWithinLimit(ticker))
+                    && ShortFundingWithinLimit(ticker, 0.0002m))
                 {
                     m_logger.LogDebug($"{Name}: {Symbol} trying to open short position");
                     if (UseMarketOrdersForEntries)
@@ -322,7 +322,7 @@ namespace CryptoBlade.Strategies.Common
                     && !buyOrders.Any()
                     && dynamicQtyLong.HasValue
                     && NoTradeForCandle(lastPrimaryQuote, LastCandleLongOrder)
-                    // && LongFundingWithinLimit(ticker)
+                    && LongFundingWithinLimit(ticker, 0.0005m)
                     && !executeParams.LongUnstucking
                     && executeParams.AllowExtraLong)
                 {
@@ -341,7 +341,7 @@ namespace CryptoBlade.Strategies.Common
                     && !sellOrders.Any()
                     && dynamicQtyShort.HasValue
                     && NoTradeForCandle(lastPrimaryQuote, LastCandleShortOrder)
-                    // && ShortFundingWithinLimit(ticker)
+                    && ShortFundingWithinLimit(ticker, 0.0005m)
                     && !executeParams.ShortUnstucking
                     && executeParams.AllowExtraShort)
                 {
@@ -795,18 +795,18 @@ namespace CryptoBlade.Strategies.Common
             return lastTrade.Value < candle.Date;
         }
 
-        private bool ShortFundingWithinLimit(Ticker ticker)
+        private bool ShortFundingWithinLimit(Ticker ticker, decimal fundingrate)
         {
             if (!ticker.FundingRate.HasValue)
                 return true;
-            return ticker.FundingRate.Value >= -m_options.Value.MaxAbsFundingRate;
+            return ticker.FundingRate.Value >= -fundingrate;
         }
 
-        private bool LongFundingWithinLimit(Ticker ticker)
+        private bool LongFundingWithinLimit(Ticker ticker, decimal fundingrate)
         {
             if (!ticker.FundingRate.HasValue)
                 return true;
-            return ticker.FundingRate.Value <= m_options.Value.MaxAbsFundingRate;
+            return ticker.FundingRate.Value <= fundingrate;
         }
 
         private decimal? CalculateDynamicQty(decimal price, decimal walletExposure)
