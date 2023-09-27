@@ -120,23 +120,21 @@ namespace CryptoBlade.Strategies
                 Position? shortPosition = ShortPosition;
                 
                 hasBuySignal = hasMinVolume
-                               && belowLinRegChannel1min
-                               && belowLinRegChannel5min
-                               && belowKChannel5min
-                               && hasMinSpread
-                               && canBeTraded;
+                                && belowLinRegChannel1min
+                                && belowLinRegChannel5min
+                                && belowKChannel5min
+                                && hasMinSpread
+                                && canBeTraded;
                                // && (close_ha < -20);
 
                 hasBuyExtraSignal = hasMinVolume
-                               && longPosition != null
-                               && ticker.BestBidPrice < longPosition.AveragePrice
-                               && belowKChannel1min
-                               && hasMinSpread
-                               && canBeTraded
-                               && (belowLinRegChannel1min || (belowKChannel1min && (ticker.BestBidPrice < longPosition.AveragePrice/1.07m)));
+                                && belowLinRegChannel1min
+                                && belowKChannel1min
+                                && longPosition != null
+                                && ticker.BestBidPrice < longPosition.AveragePrice
+                                && hasMinSpread
+                                && canBeTraded;
                                // && (close_ha < -20);
-                               
-                               
 
                 hasSellSignal = hasMinVolume
                                 && aboveLinRegChannel1min
@@ -147,15 +145,13 @@ namespace CryptoBlade.Strategies
                                 // && (close_ha > 20);
 
                 hasSellExtraSignal = hasMinVolume
+                                && aboveLinRegChannel1min
+                                && aboveKChannel1min
                                 && shortPosition != null
                                 && ticker.BestAskPrice > shortPosition.AveragePrice
-                                && aboveKChannel1min
                                 && hasMinSpread
-                                && canBeTraded
-                                && (aboveLinRegChannel1min || (aboveKChannel1min && (ticker.BestAskPrice > shortPosition.AveragePrice*1.07m)));
+                                && canBeTraded;
                                 //&& (close_ha > 20);
-                                
-                                
 
                 indicators.Add(new StrategyIndicator(nameof(IndicatorType.Volume1Min), volume));
                 indicators.Add(new StrategyIndicator(nameof(IndicatorType.MainTimeFrameVolume), volume));
