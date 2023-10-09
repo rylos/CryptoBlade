@@ -9,5 +9,6 @@ namespace CryptoBlade.Configuration
         public LinearRegressionRyLoS LinearRegressionRyLoS { get; set; } = new LinearRegressionRyLoS();
         public Tartaglia Tartaglia { get; set; } = new Tartaglia();
         public Mona Mona { get; set; } = new Mona();
+        public MfiRsiEriTrend MfiRsiEriTrend { get; set; } = new MfiRsiEriTrend();
     }
 }
