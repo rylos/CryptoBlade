@@ -36,20 +36,22 @@ namespace CryptoBlade.Strategies
         protected override int DcaOrdersCount => m_options.Value.DcaOrdersCount;
         protected override bool ForceMinQty => m_options.Value.ForceMinQty;
 
+        protected decimal previous_funding_rate;
+
         protected override Task<SignalEvaluation> EvaluateSignalsInnerAsync(CancellationToken cancel)
         {
             var quotes1min = QuoteQueues[TimeFrame.OneMinute].GetQuotes();
-            var quotes5min = QuoteQueues[TimeFrame.FiveMinutes].GetQuotes();
+            //var quotes5min = QuoteQueues[TimeFrame.FiveMinutes].GetQuotes();
             List<StrategyIndicator> indicators = new();
             var lastQuote1min = quotes1min.LastOrDefault();
-            var lastQuote5min = quotes5min.LastOrDefault();
+            //var lastQuote5min = quotes5min.LastOrDefault();
             var ticker = Ticker;
             bool hasBuySignal = false;
             bool hasSellSignal = false;
             bool hasBuyExtraSignal = false;
             bool hasSellExtraSignal = false;
 
-            if (lastQuote1min != null && lastQuote5min != null && ticker != null)
+            if (lastQuote1min != null) //&& lastQuote5min != null && ticker != null)
             {
                 bool canBeTraded = (lastQuote1min.Date - SymbolInfo.LaunchTime).TotalDays > m_options.Value.InitialUntradableDays;
                 var spread5Min = TradeSignalHelpers.Get5MinSpread(quotes1min); //giusto che lo faccia su 1min
@@ -58,35 +60,36 @@ namespace CryptoBlade.Strategies
                 bool hasMinVolume = volume >= m_options.Value.MinimumVolume;
                 bool belowLinRegChannel1min = false;
                 bool aboveLinRegChannel1min = false;
-                bool belowLinRegChannel5min = false;
-                bool aboveLinRegChannel5min = false;
-                bool belowKChannel1min = false;
-                bool aboveKChannel1min = false;
-                bool belowKChannel5min = false;
-                bool aboveKChannel5min = false;
+                // bool belowLinRegChannel5min = false;
+                // bool aboveLinRegChannel5min = false;
+                // bool belowKChannel1min = false;
+                // bool aboveKChannel1min = false;
+                // bool belowKChannel5min = false;
+                // bool aboveKChannel5min = false;
                 bool hasBasicConditions = canBeTraded && hasMinSpread && hasMinVolume;
                 // hasBasicConditions = true; // DEBUG
                 // double close_ha = 0;
                 if (hasBasicConditions)
                 {
                     var stdDevChn1min = quotes1min.Use(CandlePart.OC2).GetStdDevChannels(m_options.Value.ChannelLength, m_options.Value.StandardDeviation).LastOrDefault();
-                    var stdDevChn5min = quotes5min.Use(CandlePart.OC2).GetStdDevChannels(m_options.Value.ChannelLength, m_options.Value.StandardDeviation).LastOrDefault();
-                    if(stdDevChn1min!=null && stdDevChn5min!=null)
+                    // var stdDevChn5min = quotes5min.Use(CandlePart.OC2).GetStdDevChannels(m_options.Value.ChannelLength, m_options.Value.StandardDeviation).LastOrDefault();
+                    if(stdDevChn1min!=null && ticker!=null) // && stdDevChn5min!=null)
                     {
                         belowLinRegChannel1min = (double)ticker.LastPrice < stdDevChn1min.LowerChannel;
-                        belowLinRegChannel5min = (double)ticker.LastPrice < stdDevChn5min.LowerChannel;
-                        aboveLinRegChannel1min = (double)ticker.LastPrice > stdDevChn1min.UpperChannel;
-                        aboveLinRegChannel5min = (double)ticker.LastPrice > stdDevChn5min.UpperChannel;
+                    //     belowLinRegChannel5min = (double)ticker.LastPrice < stdDevChn5min.LowerChannel;
+                    //     aboveLinRegChannel1min = (double)ticker.LastPrice > stdDevChn1min.UpperChannel;
+                    //     aboveLinRegChannel5min = (double)ticker.LastPrice > stdDevChn5min.UpperChannel;
+                    // }
+                    // var kc1min = quotes1min.GetKeltner(m_options.Value.KCLength, m_options.Value.KCMultiplier).LastOrDefault();
+                    // var kc5min = quotes5min.GetKeltner(m_options.Value.KCLength, m_options.Value.KCMultiplier).LastOrDefault();
+                    // if (kc1min!=null && kc5min!=null)
+                    // {
+                    //     belowKChannel1min = (double)ticker.LastPrice < kc1min.LowerBand;
+                    //     aboveKChannel1min = (double)ticker.LastPrice > kc1min.UpperBand;
+                    //     belowKChannel5min = (double)ticker.LastPrice < kc5min.LowerBand;
+                    //     aboveKChannel5min = (double)ticker.LastPrice > kc5min.UpperBand;
                     }
-                    var kc1min = quotes1min.GetKeltner(m_options.Value.KCLength, m_options.Value.KCMultiplier).LastOrDefault();
-                    var kc5min = quotes5min.GetKeltner(m_options.Value.KCLength, m_options.Value.KCMultiplier).LastOrDefault();
-                    if (kc1min!=null && kc5min!=null)
-                    {
-                        belowKChannel1min = (double)ticker.LastPrice < kc1min.LowerBand;
-                        aboveKChannel1min = (double)ticker.LastPrice > kc1min.UpperBand;
-                        belowKChannel5min = (double)ticker.LastPrice < kc5min.LowerBand;
-                        aboveKChannel5min = (double)ticker.LastPrice > kc5min.UpperBand;
-                    }
+                    
                     
                     //HARSI ************************************************************
                     // var ha = quotes1min.GetHeikinAshi();
@@ -120,38 +123,48 @@ namespace CryptoBlade.Strategies
                 Position? shortPosition = ShortPosition;
                 
                 hasBuySignal = hasMinVolume
-                                && belowLinRegChannel1min
-                                && belowLinRegChannel5min
-                                && belowKChannel5min
+                                //&& belowLinRegChannel1min
+                                //&& belowLinRegChannel5min
+                                //&& belowKChannel5min
                                 && hasMinSpread
-                                && canBeTraded;
+                                && canBeTraded
                                // && (close_ha < -20);
+                                && ticker!=null
+                                && ticker.FundingRate < 0.0001m
+                                && previous_funding_rate >= 0.0001m;
 
                 hasBuyExtraSignal = hasMinVolume
                                 && belowLinRegChannel1min
-                                && belowKChannel1min
+                                //&& belowKChannel1min
                                 && longPosition != null
+                                && ticker!=null
                                 && ticker.BestBidPrice < longPosition.AveragePrice
                                 && hasMinSpread
                                 && canBeTraded;
                                // && (close_ha < -20);
 
                 hasSellSignal = hasMinVolume
-                                && aboveLinRegChannel1min
-                                && aboveLinRegChannel5min
-                                && aboveKChannel5min
+                                //&& aboveLinRegChannel1min
+                                //&& aboveLinRegChannel5min
+                                //&& aboveKChannel5min
                                 && hasMinSpread
-                                && canBeTraded;
+                                && canBeTraded
                                 // && (close_ha > 20);
+                                && ticker!=null
+                                && ticker.FundingRate > 0.0001m
+                                && previous_funding_rate <= 0.0001m;
 
                 hasSellExtraSignal = hasMinVolume
                                 && aboveLinRegChannel1min
-                                && aboveKChannel1min
+                                //&& aboveKChannel1min
                                 && shortPosition != null
+                                && ticker!=null
                                 && ticker.BestAskPrice > shortPosition.AveragePrice
                                 && hasMinSpread
                                 && canBeTraded;
                                 //&& (close_ha > 20);
+
+                if(ticker!=null && ticker.FundingRate!=null) previous_funding_rate = (decimal)ticker.FundingRate;
 
                 indicators.Add(new StrategyIndicator(nameof(IndicatorType.Volume1Min), volume));
                 indicators.Add(new StrategyIndicator(nameof(IndicatorType.MainTimeFrameVolume), volume));
