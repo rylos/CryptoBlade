@@ -36,7 +36,7 @@ namespace CryptoBlade.Strategies
         protected override int DcaOrdersCount => m_options.Value.DcaOrdersCount;
         protected override bool ForceMinQty => m_options.Value.ForceMinQty;
 
-        protected decimal previous_funding_rate;
+        //protected decimal previous_funding_rate;
 
         protected override Task<SignalEvaluation> EvaluateSignalsInnerAsync(CancellationToken cancel)
         {
@@ -123,15 +123,15 @@ namespace CryptoBlade.Strategies
                 Position? shortPosition = ShortPosition;
                 
                 hasBuySignal = hasMinVolume
-                                //&& belowLinRegChannel1min
+                                && belowLinRegChannel1min
                                 //&& belowLinRegChannel5min
                                 //&& belowKChannel5min
                                 && hasMinSpread
                                 && canBeTraded
                                // && (close_ha < -20);
                                 && ticker!=null
-                                && ticker.FundingRate < 0.0000m //era 0.0001m
-                                && previous_funding_rate >= 0.0000m;
+                                && ticker.FundingRate < 0.0001m;
+                                //&& previous_funding_rate >= 0.0001m;
 
                 hasBuyExtraSignal = hasMinVolume
                                 && belowLinRegChannel1min
@@ -144,15 +144,15 @@ namespace CryptoBlade.Strategies
                                // && (close_ha < -20);
 
                 hasSellSignal = hasMinVolume
-                                //&& aboveLinRegChannel1min
+                                && aboveLinRegChannel1min
                                 //&& aboveLinRegChannel5min
                                 //&& aboveKChannel5min
                                 && hasMinSpread
                                 && canBeTraded
                                 // && (close_ha > 20);
                                 && ticker!=null
-                                && ticker.FundingRate > 0.0001m
-                                && previous_funding_rate <= 0.0001m;
+                                && ticker.FundingRate > 0.0001m;
+                                //&& previous_funding_rate <= 0.0001m;
 
                 hasSellExtraSignal = hasMinVolume
                                 && aboveLinRegChannel1min
@@ -164,7 +164,7 @@ namespace CryptoBlade.Strategies
                                 && canBeTraded;
                                 //&& (close_ha > 20);
 
-                if(ticker!=null && ticker.FundingRate!=null) previous_funding_rate = (decimal)ticker.FundingRate;
+                //if(ticker!=null && ticker.FundingRate!=null) previous_funding_rate = (decimal)ticker.FundingRate;
 
                 indicators.Add(new StrategyIndicator(nameof(IndicatorType.Volume1Min), volume));
                 indicators.Add(new StrategyIndicator(nameof(IndicatorType.MainTimeFrameVolume), volume));
