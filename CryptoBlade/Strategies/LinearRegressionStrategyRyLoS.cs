@@ -130,8 +130,8 @@ namespace CryptoBlade.Strategies
                                 && canBeTraded
                                // && (close_ha < -20);
                                 && ticker!=null
-                                && ticker.FundingRate < 0.0001m
-                                && previous_funding_rate >= 0.0001m;
+                                && ticker.FundingRate < 0.0000m //era 0.0001m
+                                && previous_funding_rate >= 0.0000m;
 
                 hasBuyExtraSignal = hasMinVolume
                                 && belowLinRegChannel1min
