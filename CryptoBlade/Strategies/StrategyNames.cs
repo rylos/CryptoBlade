@@ -9,5 +9,6 @@
         public const string LinearRegressionRyLoS = "LinearRegressionRyLoS";
         public const string Tartaglia = "Tartaglia";
         public const string Mona = "Mona";
+        public const string Qiqi = "Qiqi";
     }
 }
