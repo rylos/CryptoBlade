@@ -182,6 +182,7 @@ namespace CryptoBlade.Mapping
                 QtyStep = symbol.LotSizeFilter?.QuantityStep,
                 MaxLeverage = symbol.LeverageFilter?.MaxLeverage,
                 LaunchTime = symbol.LaunchTime,
+                FundingInterval = symbol.FundingInterval,
             };
         }
 

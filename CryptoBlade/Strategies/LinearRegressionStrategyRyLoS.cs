@@ -36,7 +36,7 @@ namespace CryptoBlade.Strategies
         protected override int DcaOrdersCount => m_options.Value.DcaOrdersCount;
         protected override bool ForceMinQty => m_options.Value.ForceMinQty;
 
-        //protected decimal previous_funding_rate;
+        protected decimal previous_funding_rate;
 
         protected override Task<SignalEvaluation> EvaluateSignalsInnerAsync(CancellationToken cancel)
         {
@@ -50,6 +50,12 @@ namespace CryptoBlade.Strategies
             bool hasSellSignal = false;
             bool hasBuyExtraSignal = false;
             bool hasSellExtraSignal = false;
+            
+            // DateTime utcTime = DateTime.UtcNow;
+            // bool isFundingTime00 = utcTime.Hour == 23 && utcTime.Minute == 59 && utcTime.Second >= 50;
+            // bool isFundingTime08 = utcTime.Hour == 07 && utcTime.Minute == 59 && utcTime.Second >= 50;
+            // bool isFundingTime16 = utcTime.Hour == 15 && utcTime.Minute == 59 && utcTime.Second >= 50;
+            // bool isFundingTime = isFundingTime00 || isFundingTime08 || isFundingTime16;
 
             if (lastQuote1min != null) //&& lastQuote5min != null && ticker != null)
             {
@@ -60,6 +66,7 @@ namespace CryptoBlade.Strategies
                 bool hasMinVolume = volume >= m_options.Value.MinimumVolume;
                 bool belowLinRegChannel1min = false;
                 bool aboveLinRegChannel1min = false;
+                int secondsToFundingRate = 3600; 
                 // bool belowLinRegChannel5min = false;
                 // bool aboveLinRegChannel5min = false;
                 // bool belowKChannel1min = false;
@@ -88,6 +95,13 @@ namespace CryptoBlade.Strategies
                     //     aboveKChannel1min = (double)ticker.LastPrice > kc1min.UpperBand;
                     //     belowKChannel5min = (double)ticker.LastPrice < kc5min.LowerBand;
                     //     aboveKChannel5min = (double)ticker.LastPrice > kc5min.UpperBand;
+                    }
+                    DateTime utcNow = DateTime.UtcNow;
+                    int secondsPassed = utcNow.Hour * 3600 + utcNow.Minute * 60 + utcNow.Second;
+                    if(SymbolInfo.FundingInterval.HasValue) {
+                        int fundinginterval_seconds = (int)(SymbolInfo.FundingInterval * 60);
+                        secondsToFundingRate = secondsPassed % fundinginterval_seconds;
+                        int secondsToNextFundingInterval = fundinginterval_seconds - secondsToFundingRate;
                     }
                     
                     
@@ -123,15 +137,15 @@ namespace CryptoBlade.Strategies
                 Position? shortPosition = ShortPosition;
                 
                 hasBuySignal = hasMinVolume
-                                && belowLinRegChannel1min
+                                //&& belowLinRegChannel1min
                                 //&& belowLinRegChannel5min
                                 //&& belowKChannel5min
                                 && hasMinSpread
                                 && canBeTraded
                                // && (close_ha < -20);
                                 && ticker!=null
-                                && ticker.FundingRate < 0.0001m;
-                                //&& previous_funding_rate >= 0.0001m;
+                                && ticker.FundingRate >= 0.000m
+                                && previous_funding_rate < 0.000m;
 
                 hasBuyExtraSignal = hasMinVolume
                                 && belowLinRegChannel1min
@@ -144,15 +158,15 @@ namespace CryptoBlade.Strategies
                                // && (close_ha < -20);
 
                 hasSellSignal = hasMinVolume
-                                && aboveLinRegChannel1min
+                                //&& aboveLinRegChannel1min
                                 //&& aboveLinRegChannel5min
                                 //&& aboveKChannel5min
                                 && hasMinSpread
                                 && canBeTraded
                                 // && (close_ha > 20);
                                 && ticker!=null
-                                && ticker.FundingRate > 0.0001m;
-                                //&& previous_funding_rate <= 0.0001m;
+                                && ticker.FundingRate <= 0.0001m
+                                && previous_funding_rate > 0.0001m;
 
                 hasSellExtraSignal = hasMinVolume
                                 && aboveLinRegChannel1min
@@ -164,7 +178,7 @@ namespace CryptoBlade.Strategies
                                 && canBeTraded;
                                 //&& (close_ha > 20);
 
-                //if(ticker!=null && ticker.FundingRate!=null) previous_funding_rate = (decimal)ticker.FundingRate;
+                if(ticker!=null && ticker.FundingRate!=null) previous_funding_rate = (decimal)ticker.FundingRate;
 
                 indicators.Add(new StrategyIndicator(nameof(IndicatorType.Volume1Min), volume));
                 indicators.Add(new StrategyIndicator(nameof(IndicatorType.MainTimeFrameVolume), volume));
